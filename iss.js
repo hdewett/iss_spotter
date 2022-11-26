@@ -47,5 +47,26 @@ const fetchCoordsByIP = function(ip, callback) {
   });
 }
 
+const fetchISSFlyOverTimes = function(coords, callback) {
+  request(`https://iss-flyover.herokuapp.com/json/?lat=${coords.latitude}&lon=${coords.longitude}`, function(error, response, body) {
+    // error can be set if invalid domain, user is offline, etc.
+    if (error) {
+      callback(error, null);
+      return;
+    }
+    // if non-200 status, assume server error
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching flyover. Response: ${body}`;
+      callback(Error(msg), null);
+      return;
+    }
 
-module.exports = { fetchCoordsByIP };
+    let flyover = JSON.parse(body)["response"];
+
+    callback(null, flyover);
+
+  });
+};
+
+
+module.exports = { fetchISSFlyOverTimes };
